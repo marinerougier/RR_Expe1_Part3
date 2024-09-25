@@ -1,0 +1,1092 @@
+<!-- 
+DESCRIPTION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-->
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>exp</title>
+  <script src="jsPsych-6.1.0/jspsych.js"></script>
+  <script src="jsPsych-6.1.0/plugins/jspsych-fullscreen.js"></script>
+  <script src="jsPsych-6.1.0/plugins/jspsych-html-keyboard-response.js"></script>
+  <script src="jsPsych-6.1.0/plugins/jspsych-html-slider-response.js"></script>
+  <script src="jsPsych-6.1.0/plugins/jspsych-html-button-response.js"></script>
+  <script src="jsPsych-6.1.0/plugins/jspsych-survey-text.js"></script>
+  <script src="jsPsych-6.1.0/plugins/jspsych-survey-likert.js"></script>
+  <script src="jsPsych-6.1.0/plugins/jspsych-survey-multi-choice.js"></script>
+  <script src="jsPsych-6.1.0/plugins/jspsych-external-html.js"></script>
+  <script src="js/jspsych-html-slider-response_required.js"></script>
+  <script src="js/jquery.min.js"></script>
+  <script src="js/lodash.min.js"></script>
+  <script src="js/firebase.js"></script>
+  <link href="jsPsych-6.1.0/css/jspsych.css" rel="stylesheet" type="text/css">
+  <style>
+  body {
+    cursor: default;
+  }
+  #jspsych-html-slider-response-next {
+    margin: 0px;
+  }
+  .imgJudge {
+    width: 300px;
+    margin: 0px;
+    padding: 0px;
+  }
+  .jspsych-content-wrapper {
+    width: 900px;
+    height: 1500px;
+  }
+</style>
+</head>
+<body></body>
+<script>
+  /* Parameters */
+  var n = 2; // number of CIs randomly sample for each cell (should be 2)
+  var githubCIs = 'stimuli/'; // github CIs path
+
+  /* Initial variables */
+  var timeline = [];
+  var preloadimages = [];
+  var prolificID = jsPsych.data.getURLVariable("PROLIFIC_PID"); // Need to add ?prolificID={{%PROLIFIC_PID%}} at the end of the prolific survey link!
+  var id = jsPsych.randomization.randomID(15); // short ID
+
+  /* Functions */
+  function flatten(arr) {
+    return arr.reduce(function (flat, toFlatten) {
+      return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
+    }, []);
+  };
+
+  // Average CIs
+var imgLink_avg = [
+  "ci_Av.png", 
+  "ci_AppAgg.png", 
+  "ci_AppAff.png"
+];
+
+  // Subgroup CIs
+var imgLink_sbgp_AppAff_blue_G1B = [
+"ci_1_sbgp_AppAff_blue_G1B.png",
+"ci_2_sbgp_AppAff_blue_G1B.png",
+"ci_3_sbgp_AppAff_blue_G1B.png",
+"ci_4_sbgp_AppAff_blue_G1B.png",
+"ci_5_sbgp_AppAff_blue_G1B.png",
+"ci_6_sbgp_AppAff_blue_G1B.png",
+"ci_7_sbgp_AppAff_blue_G1B.png",
+"ci_8_sbgp_AppAff_blue_G1B.png",
+"ci_9_sbgp_AppAff_blue_G1B.png",
+"ci_10_sbgp_AppAff_blue_G1B.png",
+"ci_11_sbgp_AppAff_blue_G1B.png",
+"ci_12_sbgp_AppAff_blue_G1B.png",
+"ci_13_sbgp_AppAff_blue_G1B.png",
+"ci_14_sbgp_AppAff_blue_G1B.png",
+"ci_15_sbgp_AppAff_blue_G1B.png",
+"ci_16_sbgp_AppAff_blue_G1B.png",
+"ci_17_sbgp_AppAff_blue_G1B.png",
+"ci_18_sbgp_AppAff_blue_G1B.png",
+"ci_19_sbgp_AppAff_blue_G1B.png",
+"ci_20_sbgp_AppAff_blue_G1B.png",
+"ci_21_sbgp_AppAff_blue_G1B.png",
+"ci_22_sbgp_AppAff_blue_G1B.png",
+"ci_23_sbgp_AppAff_blue_G1B.png",
+"ci_24_sbgp_AppAff_blue_G1B.png",
+"ci_25_sbgp_AppAff_blue_G1B.png"
+];
+
+var imgLink_sbgp_AppAff_yellow_G1B = [
+"ci_26_sbgp_AppAff_yellow_G1B.png",
+"ci_27_sbgp_AppAff_yellow_G1B.png",
+"ci_28_sbgp_AppAff_yellow_G1B.png",
+"ci_29_sbgp_AppAff_yellow_G1B.png",
+"ci_30_sbgp_AppAff_yellow_G1B.png",
+"ci_31_sbgp_AppAff_yellow_G1B.png",
+"ci_32_sbgp_AppAff_yellow_G1B.png",
+"ci_33_sbgp_AppAff_yellow_G1B.png",
+"ci_34_sbgp_AppAff_yellow_G1B.png",
+"ci_35_sbgp_AppAff_yellow_G1B.png",
+"ci_36_sbgp_AppAff_yellow_G1B.png",
+"ci_37_sbgp_AppAff_yellow_G1B.png",
+"ci_38_sbgp_AppAff_yellow_G1B.png",
+"ci_39_sbgp_AppAff_yellow_G1B.png",
+"ci_40_sbgp_AppAff_yellow_G1B.png",
+"ci_41_sbgp_AppAff_yellow_G1B.png",
+"ci_42_sbgp_AppAff_yellow_G1B.png",
+"ci_43_sbgp_AppAff_yellow_G1B.png",
+"ci_44_sbgp_AppAff_yellow_G1B.png",
+"ci_45_sbgp_AppAff_yellow_G1B.png",
+"ci_46_sbgp_AppAff_yellow_G1B.png",
+"ci_47_sbgp_AppAff_yellow_G1B.png",
+"ci_48_sbgp_AppAff_yellow_G1B.png",
+"ci_49_sbgp_AppAff_yellow_G1B.png",
+"ci_50_sbgp_AppAff_yellow_G1B.png"
+];
+
+var imgLink_sbgp_AppAff_blue_G1Y = [
+"ci_51_sbgp_AppAff_blue_G1Y.png",
+"ci_52_sbgp_AppAff_blue_G1Y.png",
+"ci_53_sbgp_AppAff_blue_G1Y.png",
+"ci_54_sbgp_AppAff_blue_G1Y.png",
+"ci_55_sbgp_AppAff_blue_G1Y.png",
+"ci_56_sbgp_AppAff_blue_G1Y.png",
+"ci_57_sbgp_AppAff_blue_G1Y.png",
+"ci_58_sbgp_AppAff_blue_G1Y.png",
+"ci_59_sbgp_AppAff_blue_G1Y.png",
+"ci_60_sbgp_AppAff_blue_G1Y.png",
+"ci_61_sbgp_AppAff_blue_G1Y.png",
+"ci_62_sbgp_AppAff_blue_G1Y.png",
+"ci_63_sbgp_AppAff_blue_G1Y.png",
+"ci_64_sbgp_AppAff_blue_G1Y.png",
+"ci_65_sbgp_AppAff_blue_G1Y.png",
+"ci_66_sbgp_AppAff_blue_G1Y.png",
+"ci_67_sbgp_AppAff_blue_G1Y.png",
+"ci_68_sbgp_AppAff_blue_G1Y.png",
+"ci_69_sbgp_AppAff_blue_G1Y.png",
+"ci_70_sbgp_AppAff_blue_G1Y.png",
+"ci_71_sbgp_AppAff_blue_G1Y.png",
+"ci_72_sbgp_AppAff_blue_G1Y.png",
+"ci_73_sbgp_AppAff_blue_G1Y.png",
+"ci_74_sbgp_AppAff_blue_G1Y.png",
+"ci_75_sbgp_AppAff_blue_G1Y.png"
+];
+
+var imgLink_sbgp_AppAff_yellow_G1Y = [
+"ci_76_sbgp_AppAff_yellow_G1Y.png",
+"ci_77_sbgp_AppAff_yellow_G1Y.png",
+"ci_78_sbgp_AppAff_yellow_G1Y.png",
+"ci_79_sbgp_AppAff_yellow_G1Y.png",
+"ci_80_sbgp_AppAff_yellow_G1Y.png",
+"ci_81_sbgp_AppAff_yellow_G1Y.png",
+"ci_82_sbgp_AppAff_yellow_G1Y.png",
+"ci_83_sbgp_AppAff_yellow_G1Y.png",
+"ci_84_sbgp_AppAff_yellow_G1Y.png",
+"ci_85_sbgp_AppAff_yellow_G1Y.png",
+"ci_86_sbgp_AppAff_yellow_G1Y.png",
+"ci_87_sbgp_AppAff_yellow_G1Y.png",
+"ci_88_sbgp_AppAff_yellow_G1Y.png",
+"ci_89_sbgp_AppAff_yellow_G1Y.png",
+"ci_90_sbgp_AppAff_yellow_G1Y.png",
+"ci_91_sbgp_AppAff_yellow_G1Y.png",
+"ci_92_sbgp_AppAff_yellow_G1Y.png",
+"ci_93_sbgp_AppAff_yellow_G1Y.png",
+"ci_94_sbgp_AppAff_yellow_G1Y.png",
+"ci_95_sbgp_AppAff_yellow_G1Y.png",
+"ci_96_sbgp_AppAff_yellow_G1Y.png",
+"ci_97_sbgp_AppAff_yellow_G1Y.png",
+"ci_98_sbgp_AppAff_yellow_G1Y.png",
+"ci_99_sbgp_AppAff_yellow_G1Y.png",
+"ci_100_sbgp_AppAff_yellow_G1Y.png"
+];
+
+var imgLink_sbgp_AppAgg_blue_G1B = [
+"ci_101_sbgp_AppAgg_blue_G1B.png",
+"ci_102_sbgp_AppAgg_blue_G1B.png",
+"ci_103_sbgp_AppAgg_blue_G1B.png",
+"ci_104_sbgp_AppAgg_blue_G1B.png",
+"ci_105_sbgp_AppAgg_blue_G1B.png",
+"ci_106_sbgp_AppAgg_blue_G1B.png",
+"ci_107_sbgp_AppAgg_blue_G1B.png",
+"ci_108_sbgp_AppAgg_blue_G1B.png",
+"ci_109_sbgp_AppAgg_blue_G1B.png",
+"ci_110_sbgp_AppAgg_blue_G1B.png",
+"ci_111_sbgp_AppAgg_blue_G1B.png",
+"ci_112_sbgp_AppAgg_blue_G1B.png",
+"ci_113_sbgp_AppAgg_blue_G1B.png",
+"ci_114_sbgp_AppAgg_blue_G1B.png",
+"ci_115_sbgp_AppAgg_blue_G1B.png",
+"ci_116_sbgp_AppAgg_blue_G1B.png",
+"ci_117_sbgp_AppAgg_blue_G1B.png",
+"ci_118_sbgp_AppAgg_blue_G1B.png",
+"ci_119_sbgp_AppAgg_blue_G1B.png",
+"ci_120_sbgp_AppAgg_blue_G1B.png",
+"ci_121_sbgp_AppAgg_blue_G1B.png",
+"ci_122_sbgp_AppAgg_blue_G1B.png",
+"ci_123_sbgp_AppAgg_blue_G1B.png",
+"ci_124_sbgp_AppAgg_blue_G1B.png",
+"ci_125_sbgp_AppAgg_blue_G1B.png"
+];
+
+var imgLink_sbgp_AppAgg_yellow_G1B = [
+"ci_126_sbgp_AppAgg_yellow_G1B.png",
+"ci_127_sbgp_AppAgg_yellow_G1B.png",
+"ci_128_sbgp_AppAgg_yellow_G1B.png",
+"ci_129_sbgp_AppAgg_yellow_G1B.png",
+"ci_130_sbgp_AppAgg_yellow_G1B.png",
+"ci_131_sbgp_AppAgg_yellow_G1B.png",
+"ci_132_sbgp_AppAgg_yellow_G1B.png",
+"ci_133_sbgp_AppAgg_yellow_G1B.png",
+"ci_134_sbgp_AppAgg_yellow_G1B.png",
+"ci_135_sbgp_AppAgg_yellow_G1B.png",
+"ci_136_sbgp_AppAgg_yellow_G1B.png",
+"ci_137_sbgp_AppAgg_yellow_G1B.png",
+"ci_138_sbgp_AppAgg_yellow_G1B.png",
+"ci_139_sbgp_AppAgg_yellow_G1B.png",
+"ci_140_sbgp_AppAgg_yellow_G1B.png",
+"ci_141_sbgp_AppAgg_yellow_G1B.png",
+"ci_142_sbgp_AppAgg_yellow_G1B.png",
+"ci_143_sbgp_AppAgg_yellow_G1B.png",
+"ci_144_sbgp_AppAgg_yellow_G1B.png",
+"ci_145_sbgp_AppAgg_yellow_G1B.png",
+"ci_146_sbgp_AppAgg_yellow_G1B.png",
+"ci_147_sbgp_AppAgg_yellow_G1B.png",
+"ci_148_sbgp_AppAgg_yellow_G1B.png",
+"ci_149_sbgp_AppAgg_yellow_G1B.png",
+"ci_150_sbgp_AppAgg_yellow_G1B.png"
+];
+
+var imgLink_sbgp_AppAgg_blue_G1Y = [
+"ci_151_sbgp_AppAgg_blue_G1Y.png",
+"ci_152_sbgp_AppAgg_blue_G1Y.png",
+"ci_153_sbgp_AppAgg_blue_G1Y.png",
+"ci_154_sbgp_AppAgg_blue_G1Y.png",
+"ci_155_sbgp_AppAgg_blue_G1Y.png",
+"ci_156_sbgp_AppAgg_blue_G1Y.png",
+"ci_157_sbgp_AppAgg_blue_G1Y.png",
+"ci_158_sbgp_AppAgg_blue_G1Y.png",
+"ci_159_sbgp_AppAgg_blue_G1Y.png",
+"ci_160_sbgp_AppAgg_blue_G1Y.png",
+"ci_161_sbgp_AppAgg_blue_G1Y.png",
+"ci_162_sbgp_AppAgg_blue_G1Y.png",
+"ci_163_sbgp_AppAgg_blue_G1Y.png",
+"ci_164_sbgp_AppAgg_blue_G1Y.png",
+"ci_165_sbgp_AppAgg_blue_G1Y.png",
+"ci_166_sbgp_AppAgg_blue_G1Y.png",
+"ci_167_sbgp_AppAgg_blue_G1Y.png",
+"ci_168_sbgp_AppAgg_blue_G1Y.png",
+"ci_169_sbgp_AppAgg_blue_G1Y.png",
+"ci_170_sbgp_AppAgg_blue_G1Y.png",
+"ci_171_sbgp_AppAgg_blue_G1Y.png",
+"ci_172_sbgp_AppAgg_blue_G1Y.png",
+"ci_173_sbgp_AppAgg_blue_G1Y.png",
+"ci_174_sbgp_AppAgg_blue_G1Y.png",
+"ci_175_sbgp_AppAgg_blue_G1Y.png"
+];
+
+var imgLink_sbgp_AppAgg_yellow_G1Y = [
+"ci_176_sbgp_AppAgg_yellow_G1Y.png",
+"ci_177_sbgp_AppAgg_yellow_G1Y.png",
+"ci_178_sbgp_AppAgg_yellow_G1Y.png",
+"ci_179_sbgp_AppAgg_yellow_G1Y.png",
+"ci_180_sbgp_AppAgg_yellow_G1Y.png",
+"ci_181_sbgp_AppAgg_yellow_G1Y.png",
+"ci_182_sbgp_AppAgg_yellow_G1Y.png",
+"ci_183_sbgp_AppAgg_yellow_G1Y.png",
+"ci_184_sbgp_AppAgg_yellow_G1Y.png",
+"ci_185_sbgp_AppAgg_yellow_G1Y.png",
+"ci_186_sbgp_AppAgg_yellow_G1Y.png",
+"ci_187_sbgp_AppAgg_yellow_G1Y.png",
+"ci_188_sbgp_AppAgg_yellow_G1Y.png",
+"ci_189_sbgp_AppAgg_yellow_G1Y.png",
+"ci_190_sbgp_AppAgg_yellow_G1Y.png",
+"ci_191_sbgp_AppAgg_yellow_G1Y.png",
+"ci_192_sbgp_AppAgg_yellow_G1Y.png",
+"ci_193_sbgp_AppAgg_yellow_G1Y.png",
+"ci_194_sbgp_AppAgg_yellow_G1Y.png",
+"ci_195_sbgp_AppAgg_yellow_G1Y.png",
+"ci_196_sbgp_AppAgg_yellow_G1Y.png",
+"ci_197_sbgp_AppAgg_yellow_G1Y.png",
+"ci_198_sbgp_AppAgg_yellow_G1Y.png",
+"ci_199_sbgp_AppAgg_yellow_G1Y.png",
+"ci_200_sbgp_AppAgg_yellow_G1Y.png"
+];
+
+var imgLink_sbgp_Av_blue_G1B = [
+"ci_201_sbgp_Av_blue_G1B.png",
+"ci_202_sbgp_Av_blue_G1B.png",
+"ci_203_sbgp_Av_blue_G1B.png",
+"ci_204_sbgp_Av_blue_G1B.png",
+"ci_205_sbgp_Av_blue_G1B.png",
+"ci_206_sbgp_Av_blue_G1B.png",
+"ci_207_sbgp_Av_blue_G1B.png",
+"ci_208_sbgp_Av_blue_G1B.png",
+"ci_209_sbgp_Av_blue_G1B.png",
+"ci_210_sbgp_Av_blue_G1B.png",
+"ci_211_sbgp_Av_blue_G1B.png",
+"ci_212_sbgp_Av_blue_G1B.png",
+"ci_213_sbgp_Av_blue_G1B.png",
+"ci_214_sbgp_Av_blue_G1B.png",
+"ci_215_sbgp_Av_blue_G1B.png",
+"ci_216_sbgp_Av_blue_G1B.png",
+"ci_217_sbgp_Av_blue_G1B.png",
+"ci_218_sbgp_Av_blue_G1B.png",
+"ci_219_sbgp_Av_blue_G1B.png",
+"ci_220_sbgp_Av_blue_G1B.png",
+"ci_221_sbgp_Av_blue_G1B.png",
+"ci_222_sbgp_Av_blue_G1B.png",
+"ci_223_sbgp_Av_blue_G1B.png",
+"ci_224_sbgp_Av_blue_G1B.png",
+"ci_225_sbgp_Av_blue_G1B.png"
+];
+
+var imgLink_sbgp_Av_yellow_G1B = [
+"ci_226_sbgp_Av_yellow_G1B.png",
+"ci_227_sbgp_Av_yellow_G1B.png",
+"ci_228_sbgp_Av_yellow_G1B.png",
+"ci_229_sbgp_Av_yellow_G1B.png",
+"ci_230_sbgp_Av_yellow_G1B.png",
+"ci_231_sbgp_Av_yellow_G1B.png",
+"ci_232_sbgp_Av_yellow_G1B.png",
+"ci_233_sbgp_Av_yellow_G1B.png",
+"ci_234_sbgp_Av_yellow_G1B.png",
+"ci_235_sbgp_Av_yellow_G1B.png",
+"ci_236_sbgp_Av_yellow_G1B.png",
+"ci_237_sbgp_Av_yellow_G1B.png",
+"ci_238_sbgp_Av_yellow_G1B.png",
+"ci_239_sbgp_Av_yellow_G1B.png",
+"ci_240_sbgp_Av_yellow_G1B.png",
+"ci_241_sbgp_Av_yellow_G1B.png",
+"ci_242_sbgp_Av_yellow_G1B.png",
+"ci_243_sbgp_Av_yellow_G1B.png",
+"ci_244_sbgp_Av_yellow_G1B.png",
+"ci_245_sbgp_Av_yellow_G1B.png",
+"ci_246_sbgp_Av_yellow_G1B.png",
+"ci_247_sbgp_Av_yellow_G1B.png",
+"ci_248_sbgp_Av_yellow_G1B.png",
+"ci_249_sbgp_Av_yellow_G1B.png",
+"ci_250_sbgp_Av_yellow_G1B.png"
+];
+
+var imgLink_sbgp_Av_blue_G1Y = [
+"ci_251_sbgp_Av_blue_G1Y.png",
+"ci_252_sbgp_Av_blue_G1Y.png",
+"ci_253_sbgp_Av_blue_G1Y.png",
+"ci_254_sbgp_Av_blue_G1Y.png",
+"ci_255_sbgp_Av_blue_G1Y.png",
+"ci_256_sbgp_Av_blue_G1Y.png",
+"ci_257_sbgp_Av_blue_G1Y.png",
+"ci_258_sbgp_Av_blue_G1Y.png",
+"ci_259_sbgp_Av_blue_G1Y.png",
+"ci_260_sbgp_Av_blue_G1Y.png",
+"ci_261_sbgp_Av_blue_G1Y.png",
+"ci_262_sbgp_Av_blue_G1Y.png",
+"ci_263_sbgp_Av_blue_G1Y.png",
+"ci_264_sbgp_Av_blue_G1Y.png",
+"ci_265_sbgp_Av_blue_G1Y.png",
+"ci_266_sbgp_Av_blue_G1Y.png",
+"ci_267_sbgp_Av_blue_G1Y.png",
+"ci_268_sbgp_Av_blue_G1Y.png",
+"ci_269_sbgp_Av_blue_G1Y.png",
+"ci_270_sbgp_Av_blue_G1Y.png",
+"ci_271_sbgp_Av_blue_G1Y.png",
+"ci_272_sbgp_Av_blue_G1Y.png",
+"ci_273_sbgp_Av_blue_G1Y.png",
+"ci_274_sbgp_Av_blue_G1Y.png",
+"ci_275_sbgp_Av_blue_G1Y.png"
+];
+
+var imgLink_sbgp_Av_yellow_G1Y = [
+"ci_276_sbgp_Av_yellow_G1Y.png",
+"ci_277_sbgp_Av_yellow_G1Y.png",
+"ci_278_sbgp_Av_yellow_G1Y.png",
+"ci_279_sbgp_Av_yellow_G1Y.png",
+"ci_280_sbgp_Av_yellow_G1Y.png",
+"ci_281_sbgp_Av_yellow_G1Y.png",
+"ci_282_sbgp_Av_yellow_G1Y.png",
+"ci_283_sbgp_Av_yellow_G1Y.png",
+"ci_284_sbgp_Av_yellow_G1Y.png",
+"ci_285_sbgp_Av_yellow_G1Y.png",
+"ci_286_sbgp_Av_yellow_G1Y.png",
+"ci_287_sbgp_Av_yellow_G1Y.png",
+"ci_288_sbgp_Av_yellow_G1Y.png",
+"ci_289_sbgp_Av_yellow_G1Y.png",
+"ci_290_sbgp_Av_yellow_G1Y.png",
+"ci_291_sbgp_Av_yellow_G1Y.png",
+"ci_292_sbgp_Av_yellow_G1Y.png",
+"ci_293_sbgp_Av_yellow_G1Y.png",
+"ci_294_sbgp_Av_yellow_G1Y.png",
+"ci_295_sbgp_Av_yellow_G1Y.png",
+"ci_296_sbgp_Av_yellow_G1Y.png",
+"ci_297_sbgp_Av_yellow_G1Y.png",
+"ci_298_sbgp_Av_yellow_G1Y.png",
+"ci_299_sbgp_Av_yellow_G1Y.png",
+"ci_300_sbgp_Av_yellow_G1Y.png"
+];
+
+// Randomly pick n subgroup CIs within each of the condition
+  imgLink_sbgp_AppAff_blue_G1B     = _.sampleSize(imgLink_sbgp_AppAff_blue_G1B, n);
+  imgLink_sbgp_AppAff_yellow_G1B   = _.sampleSize(imgLink_sbgp_AppAff_yellow_G1B, n);
+  imgLink_sbgp_AppAff_blue_G1Y     = _.sampleSize(imgLink_sbgp_AppAff_blue_G1Y, n);
+  imgLink_sbgp_AppAff_yellow_G1Y   = _.sampleSize(imgLink_sbgp_AppAff_yellow_G1Y, n);
+
+  imgLink_sbgp_AppAgg_blue_G1B     = _.sampleSize(imgLink_sbgp_AppAgg_blue_G1B, n);
+  imgLink_sbgp_AppAgg_yellow_G1B   = _.sampleSize(imgLink_sbgp_AppAgg_yellow_G1B, n);
+  imgLink_sbgp_AppAgg_blue_G1Y     = _.sampleSize(imgLink_sbgp_AppAgg_blue_G1Y, n);
+  imgLink_sbgp_AppAgg_yellow_G1Y   = _.sampleSize(imgLink_sbgp_AppAgg_yellow_G1Y, n);
+
+  imgLink_sbgp_Av_blue_G1B     = _.sampleSize(imgLink_sbgp_Av_blue_G1B, n);
+  imgLink_sbgp_Av_yellow_G1B   = _.sampleSize(imgLink_sbgp_Av_yellow_G1B, n);
+  imgLink_sbgp_Av_blue_G1Y     = _.sampleSize(imgLink_sbgp_Av_blue_G1Y, n);
+  imgLink_sbgp_Av_yellow_G1Y   = _.sampleSize(imgLink_sbgp_Av_yellow_G1Y, n);
+
+// Randomly pick 2 CIs from the previous selection for the preview
+  preview_imgLink_sbgp_AppAff_blue_G1B    = _.sampleSize(imgLink_sbgp_AppAff_blue_G1B, 1);
+  preview_imgLink_sbgp_AppAff_yellow_G1B  = _.sampleSize(imgLink_sbgp_AppAff_yellow_G1B, 1);
+  preview_imgLink_sbgp_AppAff_blue_G1Y    = _.sampleSize(imgLink_sbgp_AppAff_blue_G1Y, 1);
+  preview_imgLink_sbgp_AppAff_yellow_G1Y  = _.sampleSize(imgLink_sbgp_AppAff_yellow_G1Y, 1);
+
+  preview_imgLink_sbgp_AppAgg_blue_G1B   = _.sampleSize(imgLink_sbgp_AppAgg_blue_G1B, 1);
+  preview_imgLink_sbgp_AppAgg_yellow_G1B  = _.sampleSize(imgLink_sbgp_AppAgg_yellow_G1B, 1);
+  preview_imgLink_sbgp_AppAgg_blue_G1Y    = _.sampleSize(imgLink_sbgp_AppAgg_blue_G1Y, 1);
+  preview_imgLink_sbgp_AppAgg_yellow_G1Y  = _.sampleSize(imgLink_sbgp_AppAgg_yellow_G1Y, 1);
+
+  preview_imgLink_sbgp_Av_blue_G1B   = _.sampleSize(imgLink_sbgp_Av_blue_G1B, 1);
+  preview_imgLink_sbgp_Av_yellow_G1B  = _.sampleSize(imgLink_sbgp_Av_yellow_G1B, 1);
+  preview_imgLink_sbgp_Av_blue_G1Y    = _.sampleSize(imgLink_sbgp_Av_blue_G1Y, 1);
+  preview_imgLink_sbgp_Av_yellow_G1Y  = _.sampleSize(imgLink_sbgp_Av_yellow_G1Y, 1);
+
+  // Add relative path to CIs
+  CIsStims_avg = imgLink_avg.map(function(e) {return githubCIs + e});
+
+  imgLink_sbgp_AppAff_blue_G1B    = imgLink_sbgp_AppAff_blue_G1B.map(function(e) {return githubCIs + e});
+  imgLink_sbgp_AppAff_yellow_G1B  = imgLink_sbgp_AppAff_yellow_G1B.map(function(e) {return githubCIs + e});
+  imgLink_sbgp_AppAff_blue_G1Y    = imgLink_sbgp_AppAff_blue_G1Y.map(function(e) {return githubCIs + e});
+  imgLink_sbgp_AppAff_yellow_G1Y  = imgLink_sbgp_AppAff_yellow_G1Y.map(function(e) {return githubCIs + e});
+
+  imgLink_sbgp_AppAgg_blue_G1B    = imgLink_sbgp_AppAgg_blue_G1B.map(function(e) {return githubCIs + e});
+  imgLink_sbgp_AppAgg_yellow_G1B  = imgLink_sbgp_AppAgg_yellow_G1B.map(function(e) {return githubCIs + e});
+  imgLink_sbgp_AppAgg_blue_G1Y    = imgLink_sbgp_AppAgg_blue_G1Y.map(function(e) {return githubCIs + e});
+  imgLink_sbgp_AppAgg_yellow_G1Y  = imgLink_sbgp_AppAgg_yellow_G1Y.map(function(e) {return githubCIs + e});
+
+  imgLink_sbgp_Av_blue_G1B    = imgLink_sbgp_Av_blue_G1B.map(function(e) {return githubCIs + e});
+  imgLink_sbgp_Av_yellow_G1B  = imgLink_sbgp_Av_yellow_G1B.map(function(e) {return githubCIs + e});
+  imgLink_sbgp_Av_blue_G1Y    = imgLink_sbgp_Av_blue_G1Y.map(function(e) {return githubCIs + e});
+  imgLink_sbgp_Av_yellow_G1Y  = imgLink_sbgp_Av_yellow_G1Y.map(function(e) {return githubCIs + e});
+
+  preview_imgLink_sbgp_AppAff_blue_G1B    = preview_imgLink_sbgp_AppAff_blue_G1B.map(function(e) {return githubCIs + e});
+  preview_imgLink_sbgp_AppAff_yellow_G1B  = preview_imgLink_sbgp_AppAff_yellow_G1B.map(function(e) {return githubCIs + e});
+  preview_imgLink_sbgp_AppAff_blue_G1Y    = preview_imgLink_sbgp_AppAff_blue_G1Y.map(function(e) {return githubCIs + e});
+  preview_imgLink_sbgp_AppAff_yellow_G1Y  = preview_imgLink_sbgp_AppAff_yellow_G1Y.map(function(e) {return githubCIs + e});
+
+  preview_imgLink_sbgp_AppAgg_blue_G1B    = preview_imgLink_sbgp_AppAgg_blue_G1B.map(function(e) {return githubCIs + e});
+  preview_imgLink_sbgp_AppAgg_yellow_G1B  = preview_imgLink_sbgp_AppAgg_yellow_G1B.map(function(e) {return githubCIs + e});
+  preview_imgLink_sbgp_AppAgg_blue_G1Y    = preview_imgLink_sbgp_AppAgg_blue_G1Y.map(function(e) {return githubCIs + e});
+  preview_imgLink_sbgp_AppAgg_yellow_G1Y  = preview_imgLink_sbgp_AppAgg_yellow_G1Y.map(function(e) {return githubCIs + e});
+
+  preview_imgLink_sbgp_Av_blue_G1B    = preview_imgLink_sbgp_Av_blue_G1B.map(function(e) {return githubCIs + e});
+  preview_imgLink_sbgp_Av_yellow_G1B  = preview_imgLink_sbgp_Av_yellow_G1B.map(function(e) {return githubCIs + e});
+  preview_imgLink_sbgp_Av_blue_G1Y    = preview_imgLink_sbgp_Av_blue_G1Y.map(function(e) {return githubCIs + e});
+  preview_imgLink_sbgp_Av_yellow_G1Y  = preview_imgLink_sbgp_Av_yellow_G1Y.map(function(e) {return githubCIs + e});
+
+  // flatten deep
+  var CIsStims_avg = _.flattenDeep([CIsStims_avg]);
+  var CIsStims_subgroup = _.flattenDeep([imgLink_sbgp_AppAff_blue_G1B, imgLink_sbgp_AppAff_yellow_G1B, imgLink_sbgp_AppAff_blue_G1Y, imgLink_sbgp_AppAff_yellow_G1Y, imgLink_sbgp_AppAgg_blue_G1B, imgLink_sbgp_AppAgg_yellow_G1B, imgLink_sbgp_AppAgg_blue_G1Y, 
+  	imgLink_sbgp_AppAgg_yellow_G1Y, imgLink_sbgp_Av_blue_G1B, imgLink_sbgp_Av_yellow_G1B, imgLink_sbgp_Av_blue_G1Y, imgLink_sbgp_Av_yellow_G1Y
+  	]);
+
+  var CIsStims_preview = _.flattenDeep([preview_imgLink_sbgp_AppAff_blue_G1B, preview_imgLink_sbgp_AppAff_yellow_G1B, preview_imgLink_sbgp_AppAff_blue_G1Y, preview_imgLink_sbgp_AppAff_yellow_G1Y, preview_imgLink_sbgp_AppAgg_blue_G1B, preview_imgLink_sbgp_AppAgg_yellow_G1B, preview_imgLink_sbgp_AppAgg_blue_G1Y, preview_imgLink_sbgp_AppAgg_yellow_G1Y, 
+  	preview_imgLink_sbgp_Av_blue_G1B, preview_imgLink_sbgp_Av_yellow_G1B, preview_imgLink_sbgp_Av_blue_G1Y, preview_imgLink_sbgp_Av_yellow_G1Y
+  	]);
+
+    // Preload images
+  preloadimages.push(CIsStims_avg);
+  preloadimages.push(CIsStims_subgroup);
+  preloadimages.push(CIsStims_preview);
+
+  // CIs stims
+  CIsStims_avg = CIsStims_avg.map(function(e) {return {imgHtml: "<img class='imgJudge' src='" + e + "'>"}});
+  CIsStims_subgroup = CIsStims_subgroup.map(function(e) {return {imgHtml: "<img class='imgJudge' src='" + e + "'>"}});
+  CIsStims_preview = CIsStims_preview.map(function(e) {return {imgHtml: "<img class='imgJudge' src='" + e + "'>"}});
+ 
+ // randomize order
+  CIsStims_avg = _.shuffle(CIsStims_avg);
+  CIsStims_subgroup = _.shuffle(CIsStims_subgroup);
+  CIsStims_preview = _.shuffle(CIsStims_preview);
+
+  // EXPERIMENT --------------------------------------------------------------------------------------------------------
+
+  /* FULL SCREEN MODE */
+  var activeFullscreen = {
+    message: "",
+    button_label: "To start the study, please switch to fullscreen",
+    type: 'fullscreen',
+    fullscreen_mode: true,
+    delay_after: 200,
+  };
+
+  // Consent
+    var check_consent = function(elem) {
+      if (document.getElementById('info').checked 
+        & document.getElementById('volunt').checked 
+        & document.getElementById('anony').checked 
+        & document.getElementById('end').checked 
+        & document.getElementById('consqc').checked 
+        & document.getElementById('summ').checked 
+        & document.getElementById('participate').checked ) {
+        return true;
+      }
+      else {
+        alert("If you wish to participate, you must check all the boxes.");
+        return false;
+      }
+      return false;
+    };
+
+
+    var consent = {
+      type:'external-html',
+      url: "https://marinerougier.github.io/Ugent_1/external_page_consent.html",
+      cont_btn: "start",
+      check_fn: check_consent
+    };
+
+
+   var instr_gene = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Faces rating</h1>";
+      html += "<p class='justify'>In this study, your task is to <b>evaluate several faces</b> (27 faces in total). "
+      html += "The study is divided into four parts. </br></br>"
+      html += "In Part 1 and 2, you will indicate, for each face, to what extent it looks <b>aggressive, trustworthy</b> and ";
+      html += "<b>criminal</b> (from 0 = not at all to 100 = totally). In Part 1, you will evaluate 3 faces and in Part 2 you will evaluate 24 faces.</br> </br>";
+      html += "As you will see, these faces have been <b>blurred</b> to make the task more challenging. </br></br>";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to begin</p>";
+      return html;
+    },
+  };
+
+  /* PART 1 */
+  var previewCIinst_avg_part1 = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Faces rating: PART 1</h1>";
+      html += "<p class='justify'>Before the evaluation task, <b>we will first briefly present you the 3 faces that you will evaluate</b> ";
+      html += "for you to better gauge the similarities and differences between them. </br> </br> ";
+      html += "Faces will be <b>automatically paced</b> during 2 seconds each. Pleace remain focused.</br></br>";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to begin</p>";
+      return html;
+    },
+  };
+
+  /* PREVIEW CIS */
+  var previewCI_avg = {
+    timeline_variables: CIsStims_avg,
+    choices: jsPsych.NO_KEYS,
+    trial_duration: 2000,
+    post_trial_gap: 100,
+    timeline: [{
+      type: 'html-keyboard-response',
+      stimulus: function() {return jsPsych.timelineVariable('imgHtml', true)},
+    }]
+  };
+
+  /* JUDGMENTS INSTRUCTIONS */
+  var jugmentInst_avg_part1 = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Faces rating: PART 1</h1>";
+      html += "<p class='justify'>Now, you will rate the 3 faces.</b>";
+      html += " Please try to answer <b> as honestly and as spontaneously as possible. </b></br></br>";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to begin</p>";
+      return html;
+    },
+  };
+
+  // Judgments
+  var scaleAgressivity = ["0</br>Not agressive at all", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100</br>Totally aggressive"];
+  var scaleTrustworthiness = ["0</br>Not trustworthy at all", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100</br>Totally trustworthy"];
+  var scaleCriminality = ["0</br>Not criminal at all", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100</br>Totally criminal"];
+
+  var items_part12 = [
+        {prompt: "", name : 'agressivity', labels: scaleAgressivity, required: true},
+        {prompt: "", name : 'trustworthiness', labels: scaleTrustworthiness, required: true},
+        {prompt: "", name : 'criminality', labels: scaleCriminality, required: true},
+  ];
+
+
+items_part12 = _.shuffle(items_part12);
+
+  var judgments_avg_part1 = [];
+  CIsStims_avg.map(function(ciImg){
+    var likert_trial = {
+        type: 'survey-likert',
+        preamble: ciImg.imgHtml,
+        questions: items_part12,
+        button_label: 'Continue',
+        on_load: function() {
+          $(".jspsych-content").css("max-width", "100%");
+          $(".jspsych-survey-likert-statement").css("margin", "0px");
+          $(".jspsych-survey-likert-statement").css("padding", "0px");
+          $(".jspsych-survey-likert-opts").css("padding", "0 0 10px");
+          $("#jspsych-survey-likert-next").css("margin-top", "10px");
+          $("#jspsych-survey-likert-form").css("width", "800px");
+          $("li").css("width", "9%");
+        //   $("li:first-of-type").css("width", "110px");
+        //   $("li:last-of-type").css("width", "110px");
+        },
+        on_finish: function(data) {
+          var parsed_response  = JSON.parse(data.responses);
+          data.agressivity     = parsed_response.agressivity * 10;
+          data.trustworthiness = parsed_response.trustworthiness * 10;
+          data.criminality     = parsed_response.criminality * 10;
+          data.ci              = ciImg.imgHtml;
+        },
+    };
+    judgments_avg_part1.push(likert_trial);
+  });
+
+  /* PART 2 */
+  var previewCIinst_subgroup_part2 = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Faces rating: PART 2</h1>";
+      html += "<p class='justify'>In this new part, you will <b>judge 24 faces</b>. </br> ";
+      html += "Before the evaluation task, <b>we will first briefly present you a sample of these faces</b> ";
+      html += "for you to better gauge the similarities and differences between them. </br></br>  ";
+      html += "Faces will be <b>automatically paced</b> during 2 seconds each. Pleace remain focused.</br></br>";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to begin</p>";
+      return html;
+    },
+      on_load: function() {
+          $(".jspsych-content").css("max-width", "90%");
+       }
+  };
+
+/* PREVIEW CIS */
+  var previewCI_subgroup = {
+    timeline_variables: CIsStims_preview,
+    choices: jsPsych.NO_KEYS,
+    trial_duration: 2000,
+    post_trial_gap: 100,
+    timeline: [{
+      type: 'html-keyboard-response',
+      stimulus: function() {return jsPsych.timelineVariable('imgHtml', true)},
+    }]
+  };
+
+  /* JUDGMENTS INSTRUCTIONS */
+  var jugmentInst_subgroup_part2 = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Faces rating: PART 2</h1>";
+      html += "<p class='justify'>Now, you will rate the 24 faces.</b>";
+      html += " Again, try to answer <b> as honestly and as spontaneously as possible. </b></br></br>";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to begin</p>";
+      return html;
+    },
+  };
+
+  var judgments_subgroup_part2 = [];
+  CIsStims_subgroup.map(function(ciImg){
+    var likert_trial = {
+        type: 'survey-likert',
+        preamble: ciImg.imgHtml,
+        questions: items_part12,
+        button_label: 'Continue',
+        on_load: function() {
+          $(".jspsych-content").css("max-width", "100%");
+          $(".jspsych-survey-likert-statement").css("margin", "0px");
+          $(".jspsych-survey-likert-statement").css("padding", "0px");
+          $(".jspsych-survey-likert-opts").css("padding", "0 0 10px");
+          $("#jspsych-survey-likert-next").css("margin-top", "10px");
+          $("#jspsych-survey-likert-form").css("width", "800px");
+          $("li").css("width", "9%");
+        //   $("li:first-of-type").css("width", "110px");
+        //   $("li:last-of-type").css("width", "110px");
+        },
+        on_finish: function(data) {
+          var parsed_response  = JSON.parse(data.responses);
+          data.agressivity     = parsed_response.agressivity * 10;
+          data.trustworthiness = parsed_response.trustworthiness * 10;
+          data.criminality     = parsed_response.criminality * 10;
+          data.ci              = ciImg.imgHtml;
+        },
+    };
+    judgments_subgroup_part2.push(likert_trial);
+  });
+
+
+  /* PART 3 and 4*/
+   var instr_gene_part34 = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Faces rating</h1>";
+      html += "<p class='justify'>Now, you will perform Part 3 and 4. "
+      html += "In Part 3 and 4, you will indicate, for each face, to what extent this face looks <b>opportunistic, rough, dominant, racist, stingy, depressive, mediocre</b> and ";
+      html += "<b>weak</b> (from 0 = not at all to 100 = totally). </br></br>";
+      html += "In Part 3, you will evaluate the group of 3 faces and in Part 4 you will evaluate the group of 24 faces (same faces as before). </br></br>";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to begin</p>";
+      return html;
+    },
+          on_load: function() {
+          $(".jspsych-content").css("max-width", "90%");
+       }
+  };
+
+  /* PART 3 */
+  var previewCIinst_avg_part3 = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Faces rating: PART 3</h1>";
+      html += "<p class='justify'>Again, as we did in Part 1, <b>we will briefly present you the 3 faces. </b></br> </br> ";
+      html += "Faces will be <b>automatically paced</b> during 2 seconds each. Pleace remain focused.</br></br>";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to begin</p>";
+      return html;
+    },
+  };
+
+  /* PREVIEW CIS */
+  var previewCI_avg = {
+    timeline_variables: CIsStims_avg,
+    choices: jsPsych.NO_KEYS,
+    trial_duration: 2000,
+    post_trial_gap: 100,
+    timeline: [{
+      type: 'html-keyboard-response',
+      stimulus: function() {return jsPsych.timelineVariable('imgHtml', true)},
+    }]
+  };
+
+  /* JUDGMENTS INSTRUCTIONS */
+  var jugmentInst_avg_part3 = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Faces rating: PART 3</h1>";
+      html += "<p class='justify'>Now, you will rate the 3 faces.</b>";
+      html += " Again, try to answer <b> as honestly and as spontaneously as possible. </b></br></br>";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to begin</p>";
+      return html;
+    },
+  };
+
+// Judgments
+  // Traits of avoidance
+  var scaleOpportunistic = ["0</br>Not opportunistic at all", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100</br>Totally opportunistic"];
+  var scaleRough         = ["0</br>Not rough at all", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100</br>Totally rough"];
+  var scaleDominant      = ["0</br>Not dominant at all", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100</br>Totally dominant"];
+  var scaleRacist        = ["0</br>Not racist at all", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100</br>Totally racist"];
+  
+  // Traits of aggressive approach
+  var scaleStingy        = ["0</br>Not stingy at all", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100</br>Totally stingy"];
+  var scaleDepressive    = ["0</br>Not depressive at all", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100</br>Totally depressive"];
+  var scaleMediocre      = ["0</br>Not mediocre at all", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100</br>Totally mediocre"];
+  var scaleWeak          = ["0</br>Not weak at all", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100</br>Totally weak"];
+
+  var items_part34 = [
+        {prompt: "", name : 'opportunistic', labels: scaleOpportunistic, required: true},
+        {prompt: "", name : 'rough', labels: scaleRough, required: true},
+        {prompt: "", name : 'dominant', labels: scaleDominant, required: true},
+        {prompt: "", name : 'racist', labels: scaleRacist, required: true},
+        {prompt: "", name : 'stingy', labels: scaleStingy, required: true},
+        {prompt: "", name : 'depressive', labels: scaleDepressive, required: true},
+        {prompt: "", name : 'mediocre', labels: scaleMediocre, required: true},
+        {prompt: "", name : 'weak', labels: scaleWeak, required: true},
+  ];
+
+  items_part34 = _.shuffle(items_part34);
+
+
+  var judgments_avg_part3 = [];
+  CIsStims_avg.map(function(ciImg){
+    var likert_trial = {
+        type: 'survey-likert',
+        preamble: ciImg.imgHtml,
+        questions: items_part34,
+        button_label: 'Continue',
+        on_load: function() {
+          $(".jspsych-content").css("max-width", "100%");
+          $(".jspsych-survey-likert-statement").css("margin", "0px");
+          $(".jspsych-survey-likert-statement").css("padding", "0px");
+          $(".jspsych-survey-likert-opts").css("padding", "0 0 10px");
+          $("#jspsych-survey-likert-next").css("margin-top", "10px");
+          $("#jspsych-survey-likert-form").css("width", "800px");
+          $("li").css("width", "9%");
+        //   $("li:first-of-type").css("width", "110px");
+        //   $("li:last-of-type").css("width", "110px");
+        },
+        on_finish: function(data) {
+          var parsed_response  = JSON.parse(data.responses);
+          data.opportunistic   = parsed_response.opportunistic * 10;
+          data.rough           = parsed_response.rough * 10;
+          data.dominant        = parsed_response.dominant * 10;
+          data.racist          = parsed_response.racist * 10;
+          data.stingy          = parsed_response.stingy * 10;
+          data.depressive      = parsed_response.depressive * 10;
+          data.mediocre        = parsed_response.mediocre * 10;
+          data.weak            = parsed_response.weak * 10;
+          data.ci              = ciImg.imgHtml;
+        },
+    };
+    judgments_avg_part3.push(likert_trial);
+  });
+
+
+  /* PART 4 */
+ var previewCIinst_subgroup_part4 = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Faces rating: PART 4</h1>";
+      html += "<p class='justify'>In this part, you will <b>judge 24 faces</b>. </br> ";
+      html += "Again, <b>we will first briefly present you a sample of these faces. </b></br></br>  ";
+      html += "Faces will be <b>automatically paced </b>during 2 seconds each. Pleace remain focused.</br></br>";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to begin</p>";
+      return html;
+    },
+      on_load: function() {
+          $(".jspsych-content").css("max-width", "90%");
+       }
+  };
+
+/* PREVIEW CIS */
+  var previewCI_subgroup = {
+    timeline_variables: CIsStims_preview,
+    choices: jsPsych.NO_KEYS,
+    trial_duration: 2000,
+    post_trial_gap: 100,
+    timeline: [{
+      type: 'html-keyboard-response',
+      stimulus: function() {return jsPsych.timelineVariable('imgHtml', true)},
+    }]
+  };
+
+  /* JUDGMENTS INSTRUCTIONS */
+ var jugmentInst_subgroup_part4 = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Faces rating: PART 4</h1>";
+      html += "<p class='justify'>Now, you will rate the 24 faces.</b>";
+      html += " Again, try to answer <b> as honestly and as spontaneously as possible. </b></br></br>";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to begin</p>";
+      return html;
+    },
+  };
+
+  var judgments_subgroup_part4 = [];
+  CIsStims_subgroup.map(function(ciImg){
+    var likert_trial = {
+        type: 'survey-likert',
+        preamble: ciImg.imgHtml,
+        questions: items_part34,
+        button_label: 'Continue',
+        on_load: function() {
+          $(".jspsych-content").css("max-width", "100%");
+          $(".jspsych-survey-likert-statement").css("margin", "0px");
+          $(".jspsych-survey-likert-statement").css("padding", "0px");
+          $(".jspsych-survey-likert-opts").css("padding", "0 0 10px");
+          $("#jspsych-survey-likert-next").css("margin-top", "10px");
+          $("#jspsych-survey-likert-form").css("width", "800px");
+          $("li").css("width", "9%");
+        //   $("li:first-of-type").css("width", "110px");
+        //   $("li:last-of-type").css("width", "110px");
+        },
+        on_finish: function(data) {
+          var parsed_response  = JSON.parse(data.responses);
+          data.opportunistic   = parsed_response.opportunistic * 10;
+          data.rough           = parsed_response.rough * 10;
+          data.dominant        = parsed_response.dominant * 10;
+          data.racist          = parsed_response.racist * 10;
+          data.stingy          = parsed_response.stingy * 10;
+          data.depressive      = parsed_response.depressive * 10;
+          data.mediocre        = parsed_response.mediocre * 10;
+          data.weak            = parsed_response.weak * 10;
+          data.ci              = ciImg.imgHtml;
+        },
+    };
+    judgments_subgroup_part4.push(likert_trial);
+  });
+
+ var instr_demo = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<p class='justify'>Part 4 is over. </b>";
+      html += "In this final phase, we will ask you a few questions.</br></br>";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to begin</p>";
+      return html;
+    },
+  };
+
+
+  /* AGE */
+  var age = {
+      timeline: [{
+        type: 'survey-text',
+        questions: [{prompt: "How old are you?", rows: 1, columns: 10}],
+        button_label: "Continue",
+      }],
+      on_load: function() {
+          window.scrollTo(0, 0);
+          $(".jspsych-content").css("margin-top", "200px");
+          $(".jspsych-content").css("max-width", "90%");
+        },
+      loop_function: function(data){ 
+        var age = data.values()[0].responses;
+        var age = JSON.parse(age).Q0; 
+        if(age == ""){
+          alert("Please indicate your age"); 
+          return true; 
+        }
+      },
+      on_finish: function(data) {
+          jsPsych.data.addProperties({
+              age: JSON.parse(data.responses)["Q0"],
+          });
+      },
+  };
+
+  var gender = {
+      type: 'survey-multi-choice',
+      questions: [{prompt: "Please indicate your gender:", options: ['Male', 'Female', 'Other'], required: true}],
+      button_label: "Continue",
+      on_finish: function(data) {
+          jsPsych.data.addProperties({
+              gender: JSON.parse(data.responses)["Q0"],
+          });
+      },
+  };
+
+  var Prolific_reported = {
+        timeline: [{
+            type: 'survey-text',
+            questions: [{ prompt: 'Please indicate your Prolific ID:', rows: 3, columns: 60 }],
+            button_label: "continue",
+        }],
+        loop_function: function (data) {
+            var res = data.values()[0].responses;
+            var res = JSON.parse(res).Q0;
+            if (res == "") {
+                alert("Please answer the question");
+                return true;
+            }
+        },
+        on_finish: function (data) {
+            jsPsych.data.addProperties({
+                Prolific_reported: JSON.parse(data.responses).Q0,
+            });
+        },
+    };
+
+  var comments = {
+        timeline: [{
+            type: 'survey-text',
+            questions: [{ prompt: 'Do you have comments regarding this study? [Optional]', rows: 3, columns: 60 }],
+            button_label: "continue",
+        }],
+        on_finish: function (data) {
+            jsPsych.data.addProperties({
+                Comment: JSON.parse(data.responses).Q0,
+            });
+        },
+    };
+
+  /* EXIT FULLSCREEN MODE */
+  var exitFullscreen = {
+    type: 'fullscreen',
+    fullscreen_mode: false
+  };
+
+  /* DEBRIEF */
+  var debrief = [];
+  debrief += "<h1>End of the study</h1>";
+  debrief += "<p class='justify'>Thank you for your participation! The aim of this study was to investigate the perception ";
+  debrief += "of unknown and ambiguous faces that come from another experiment.</br></br> "
+  debrief += "You can copy this code on Prolific: <b>7B9D5899</b> ";
+  debrief += "or you can click on the following link to validate your participation:</p>";
+  debrief += "<a href='https://app.prolific.com/submissions/complete?cc=7B9D5899' target='_blank'>click here</a>";
+
+  // TIMELINE ----------------------------------------------------------------------------------------------------------
+  timeline.push(consent);
+  timeline.push(activeFullscreen);
+  timeline.push(instr_gene);
+  timeline.push(previewCIinst_avg_part1);
+  timeline.push(previewCI_avg);
+  timeline.push(jugmentInst_avg_part1);
+  timeline.push(judgments_avg_part1);
+  timeline.push(previewCIinst_subgroup_part2);
+  timeline.push(previewCI_subgroup);
+  timeline.push(jugmentInst_subgroup_part2);
+  timeline.push(judgments_subgroup_part2);
+  timeline.push(instr_gene_part34);
+  timeline.push(previewCIinst_avg_part3);
+  timeline.push(previewCI_avg);
+  timeline.push(jugmentInst_avg_part3);
+  timeline.push(judgments_avg_part3);
+  timeline.push(previewCIinst_subgroup_part4);
+  timeline.push(previewCI_subgroup);
+  timeline.push(jugmentInst_subgroup_part4);
+  timeline.push(judgments_subgroup_part4);
+  timeline.push(instr_demo);
+  timeline.push(age);
+  timeline.push(gender);
+  timeline.push(Prolific_reported);
+  timeline.push(comments);  
+  timeline.push(exitFullscreen);
+  
+  timeline = flatten(timeline); // do not remove this!
+
+  // INITIALISE EXP ----------------------------------------------------------------------------------------------------
+  jsPsych.init({
+    timeline: timeline,
+    preload_images: preloadimages,
+    max_load_time: 500*1000,
+    exclusions: {
+      min_width: 700,
+      min_height: 550,
+      max_width: 1600,
+      max_height: 900,
+    },
+    on_finish: function(data) { 
+      $("#jspsych-content").html("<img src='https://i.gifer.com/4V0b.gif'>");
+
+      /* Initialize Firebase */
+      var config = {
+        apiKey: "AIzaSyBwDr8n-RNCbBOk1lKIxw7AFgslXGcnQzM",
+        databaseURL: "https://postdocgent.firebaseio.com/"
+      };
+
+      firebase.initializeApp(config);
+      var database = firebase.database();
+
+      /* jsPsych: add data to every trial */
+      jsPsych.data.addProperties({
+        prolificID: prolificID,
+        id: id,
+        totalTime: jsPsych.totalTime()
+      });
+
+      var subdata = data.filter({trial_type: 'survey-likert'}).csv();
+      //jsPsych.data.displayData();
+
+      /* Send data to Firebase and redirect to Qualtrics */
+      database.ref("RR_Expe1_Part3/" + id + "/").update({subdata}).then(function() { 
+        console.log("data sent!");
+        $("#jspsych-content").html(debrief);
+        //window.location = qlink; // redirect to qualtrics
+      });
+    }
+  });
+</script>
+
+</html>
